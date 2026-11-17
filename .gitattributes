@@ -1,0 +1,10 @@
+* text=auto
+*.py text eol=lf
+*.sql text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.ipynb text eol=lf
+*.bat text eol=crlf
+*.csv -text
+*.pdf binary
+.env.example text eol=lf
