@@ -43,6 +43,52 @@ Trên máy đã triển khai: PostgreSQL 18.6, host `127.0.0.1`, cổng `5433`, 
 
 Máy khác không được giả định các dịch vụ hoặc đường dẫn cài đặt giống máy cũ. Đọc `.env.example`; chọn chế độ local riêng hoặc server có sẵn như hướng dẫn. Không sửa xác thực hoặc database của dự án khác.
 
+### 3.1. Tải và cài PostgreSQL trên Windows
+
+1. Mở [trang tải chính thức PostgreSQL cho Windows](https://www.postgresql.org/download/windows/), chọn **Download the installer** để tới bộ cài EDB.
+2. Chọn **PostgreSQL 18.x, Windows x86-64**. Máy cũ đã kiểm tra với 18.6; không bắt buộc đúng bản vá 18.6.
+3. Chạy bộ cài, giữ thư mục mặc định nếu phù hợp, ví dụ `C:\Program Files\PostgreSQL\18`.
+4. Chọn **PostgreSQL Server**, **pgAdmin 4**, **Command Line Tools**. Không cần Stack Builder hoặc các gói mở rộng cho dự án này.
+5. Khi hỏi mật khẩu, đặt và ghi nhớ mật khẩu quản trị cho tài khoản **`postgres`** của dịch vụ vừa cài. Giữ cổng mặc định **5432** nếu chưa bị ứng dụng khác sử dụng. Các mục thư mục dữ liệu và locale có thể giữ mặc định.
+6. Hoàn tất cài đặt; có thể bỏ chọn chạy Stack Builder. Nếu pgAdmin chưa được cài kèm, tải riêng từ [trang pgAdmin chính thức cho Windows](https://www.pgadmin.org/download/pgadmin-4-windows/).
+
+**Phân biệt hai cấu hình:** mật khẩu quản trị `postgres` và cổng **5432** thuộc dịch vụ vừa cài. Chế độ local của dự án dùng các chương trình PostgreSQL đã cài để tự tạo cluster riêng ở cổng **5433**, database **`btl_tqhdl`**, user **`btl_app` không mật khẩu**. Không bỏ hoặc đổi mật khẩu của dịch vụ quản trị để cố kết nối ứng dụng.
+
+Máy đích cũng cần Python 3.11. Sau khi clone repo hoặc giải nén vào thư mục có quyền ghi, chạy lần lượt:
+
+1. `setup_windows.bat` — tạo `.venv`, cài thư viện và tạo `.env` từ mẫu nếu chưa có.
+2. `chay_etl.bat` — khởi động PostgreSQL riêng của dự án, tạo database và nạp dữ liệu từ raw.
+3. `chay_dashboard.bat` — mở dashboard; truy cập `http://localhost:8502`.
+
+Nếu báo không tìm thấy chương trình PostgreSQL, mở `.env` và khai báo đúng đường dẫn trên máy đích:
+
+```dotenv
+POSTGRES_LOCAL=1
+PGHOST=127.0.0.1
+PGPORT=5433
+PGDATABASE=btl_tqhdl
+PGUSER=btl_app
+PGPASSWORD=
+POSTGRES_BIN=C:/Program Files/PostgreSQL/18/bin
+```
+
+Nếu cài ở ổ/thư mục khác, thay `POSTGRES_BIN` tương ứng; thư mục đó phải chứa `pg_ctl.exe` và `initdb.exe`. Nếu máy đã có PostgreSQL phù hợp, kiểm tra bộ chương trình đang cài trước, không mặc định phải cài lại. Cách dùng server PostgreSQL sẵn có được mô tả trong `report/readme_chuyen_may.md`.
+
+Sau khi ETL chạy thành công, trong pgAdmin dùng **Register → Server** và cấu hình:
+
+| Mục | Giá trị mặc định của dự án |
+|---|---|
+| Name | Tên dễ nhận diện, ví dụ `BTL TQHDL PostgreSQL` |
+| Host name/address | `127.0.0.1` |
+| Port | `5433` |
+| Maintenance database | `btl_tqhdl` |
+| Username | `btl_app` |
+| Password | Để trống |
+
+Mở database `btl_tqhdl` → **Schemas → rentals** để xem bảng và tạo ERD. Nếu người dùng đã đổi `.env`, lấy giá trị thực tế từ cấu hình thay cho các mặc định trên. Tiếp tục mục 4 của tài liệu này để lấy ảnh thật; không coi việc cài thành công là đã có ảnh minh chứng.
+
+### 3.2. Số liệu đã kiểm tra
+
 Số liệu tham chiếu trên hai raw đang kèm repo:
 
 | Chỉ tiêu | Phongtro123 | Catalyst | Tổng |
